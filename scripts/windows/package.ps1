@@ -33,10 +33,12 @@ Enable-WSManCredSSP -Force -Role Server
 winrm set winrm/config/client/auth '@{Basic="true"}'
 winrm set winrm/config/service/auth '@{Basic="true"}'
 winrm set winrm/config/service '@{AllowUnencrypted="true"}'
-winrm set winrm/config/Service '@{MaxConcurrentOperationsPerUser="1000"}'
+winrm set winrm/config/service '@{MaxConcurrentOperationsPerUser="1500"}'
+winrm set winrm/config/service '@{MaxConnections="300"}'
 winrm set winrm/config/winrs '@{MaxMemoryPerShellMB="2048"}'
 winrm set winrm/config/winrs '@{IdleTimeout="1800000"}'
-winrm set winrm/config/winrs '@{MaxProcessesPerShell="0"}'
+winrm set winrm/config/winrs '@{MaxProcessesPerShell="30"}'
+winrm set winrm/config/winrs '@{MaxShellsPerUser="30"}'
 Write-Host "winrm setup complete"
 
 if (Test-Command -cmdname 'Uninstall-WindowsFeature') {
@@ -47,5 +49,5 @@ if (Test-Command -cmdname 'Uninstall-WindowsFeature') {
     Uninstall-WindowsFeature -Remove
 }
 
-start-sleep -s 300
-Restart-Computer
+#start-sleep -s 300
+#Restart-Computer
