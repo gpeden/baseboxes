@@ -1,6 +1,5 @@
 {
   "builders": [
-
     {
       "boot_command": [
         "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/{{user `ks_path`}}<enter><wait>"
@@ -15,7 +14,7 @@
       "iso_url": "{{user `mirror`}}/{{user `mirror_directory`}}/{{user `iso_name`}}",
       "output_directory": "{{user `output_directory`}}",
       "shutdown_command": "echo 'vagrant' | sudo -S /sbin/halt -h -p",
-      "ssh_pty" : true,
+      "ssh_pty": true,
       "ssh_password": "vagrant",
       "ssh_port": 22,
       "ssh_username": "vagrant",
@@ -33,15 +32,24 @@
   "post-processors": [
     [
       {
-      "output": "builds/{{user `box_basename`}}.{{.Provider}}.vmx",
-      "type": "vagrant",
-      "keep_input_artifact": true
+        "output": "builds/{{user `box_basename`}}.{{.Provider}}.vmx",
+        "type": "vagrant",
+        "keep_input_artifact": true
       },
       {
-      "type": "shell-local",
-      "script": "scripts/common/vmx-to-ova.sh",
-      "only": ["vmware-iso"],
-      "environment_vars": ["PACKER_OUTPUT_DIRECTORY={{user `output_directory`}}"]
+        "type": "shell-local",
+        "scripts": [
+          "scripts/common/vmx-to-ova.sh",
+          "/vagrant/scripts/push_to_artifactory.sh"
+        ],
+        "only": [
+          "vmware-iso"
+        ],
+        "environment_vars": [
+          "PACKER_OUTPUT_DIRECTORY={{user `output_directory`}}",
+          "ITEM_RELEASE={{user `version`}}",
+          "ITEM_FILENAME={{user `output_directory`}}/{{user `box_basename`}}.ova"
+        ]
       }
     ]
   ],
@@ -58,7 +66,6 @@
         "https_proxy={{user `https_proxy`}}",
         "no_proxy={{user `no_proxy`}}"
       ],
-      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E sh -eux '{{.Path}}'",
       "execute_command": "sudo yum install -y open-vm-tools",
       "scripts": [
         "scripts/common/sshd.sh",
@@ -87,8 +94,7 @@
     "name": "centos-7",
     "no_proxy": "{{env `no_proxy`}}",
     "template": "centos-7",
-    "version": "2.1.TIMESTAMP",
+    "version": "0.0.2",
     "output_directory": "packer-centos-7-vmware"
-
   }
 }
